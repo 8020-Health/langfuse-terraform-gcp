@@ -13,6 +13,8 @@ resource "google_storage_bucket" "langfuse" {
   versioning {
     enabled = true
   }
+
+  labels = var.labels
 }
 
 # Allow all access on bucket for langfuse user
