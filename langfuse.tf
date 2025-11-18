@@ -1,4 +1,7 @@
 locals {
+  postgres_host     = var.create_postgres_instance ? google_sql_database_instance.this[0].private_ip_address : var.external_postgres_host
+  postgres_password = var.create_postgres_instance ? random_password.postgres_password[0].result : var.external_postgres_password
+
   langfuse_values   = <<EOT
 langfuse:
   salt:
@@ -49,7 +52,7 @@ langfuse:
             path: redis-ca.crt
 postgresql:
   deploy: false
-  host: ${google_sql_database_instance.this.private_ip_address}
+  host: ${local.postgres_host}
   auth:
     username: langfuse
     database: langfuse
@@ -159,7 +162,7 @@ resource "kubernetes_secret" "langfuse" {
   data = {
     "redis-password"      = google_redis_instance.this.auth_string
     "redis-certificate"   = google_redis_instance.this.server_ca_certs[0].cert
-    "postgres-password"   = random_password.postgres_password.result
+    "postgres-password"   = local.postgres_password
     "salt"                = random_bytes.salt.base64
     "nextauth-secret"     = random_bytes.nextauth_secret.base64
     "clickhouse-password" = random_password.clickhouse_password.result

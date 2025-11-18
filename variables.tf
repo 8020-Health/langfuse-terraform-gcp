@@ -99,3 +99,46 @@ variable "additional_env" {
     error_message = "Each environment variable must have either 'value' or 'valueFrom' specified, but not both."
   }
 }
+
+variable "labels" {
+  description = "Labels to apply to all GCP resources created by this module"
+  type        = map(string)
+  default     = {}
+}
+
+variable "create_postgres_instance" {
+  description = "Whether to create a new PostgreSQL instance or use an external one"
+  type        = bool
+  default     = true
+}
+
+variable "external_postgres_host" {
+  description = "External PostgreSQL host to use when create_postgres_instance is false"
+  type        = string
+  default     = ""
+}
+
+variable "external_postgres_password" {
+  description = "External PostgreSQL password to use when create_postgres_instance is false"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "create_vpc" {
+  description = "Whether to create a new VPC network or use an existing one"
+  type        = bool
+  default     = true
+}
+
+variable "existing_network_name" {
+  description = "Name of existing VPC network to use when create_vpc is false"
+  type        = string
+  default     = ""
+}
+
+variable "existing_subnetwork_name" {
+  description = "Name of existing subnetwork to use when create_vpc is false"
+  type        = string
+  default     = ""
+}
