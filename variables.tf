@@ -172,7 +172,7 @@ variable "create_dns_zone" {
   type        = bool
   default     = true
 }
-  
+
 variable "ssl_certificate_name" {
   description = "Name of an existing SSL certificate to use. If not provided, a managed certificate will be created."
   type        = string
@@ -196,4 +196,47 @@ variable "provision_static_ip" {
   description = "Whether to provision a static global IP for the Ingress. Set to true if you need a stable IP for DNS configuration before deployment."
   type        = bool
   default     = false
+}
+
+variable "labels" {
+  description = "Labels to apply to all GCP resources created by this module"
+  type        = map(string)
+  default     = {}
+}
+
+variable "create_postgres_instance" {
+  description = "Whether to create a new PostgreSQL instance or use an external one"
+  type        = bool
+  default     = true
+}
+
+variable "external_postgres_host" {
+  description = "External PostgreSQL host to use when create_postgres_instance is false"
+  type        = string
+  default     = ""
+}
+
+variable "external_postgres_password" {
+  description = "External PostgreSQL password to use when create_postgres_instance is false"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "create_vpc" {
+  description = "Whether to create a new VPC network or use an existing one"
+  type        = bool
+  default     = true
+}
+
+variable "existing_network_name" {
+  description = "Name of existing VPC network to use when create_vpc is false"
+  type        = string
+  default     = ""
+}
+
+variable "existing_subnetwork_name" {
+  description = "Name of existing subnetwork to use when create_vpc is false"
+  type        = string
+  default     = ""
 }
