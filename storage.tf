@@ -3,8 +3,12 @@ locals {
   bucket_prefix = replace(var.domain, ".", "-")
 }
 
+resource "random_bytes" "bucket_suffix" {
+  length = 2
+}
+
 resource "google_storage_bucket" "langfuse" {
-  name                        = "${local.bucket_prefix}-${var.name}"
+  name                        = "${local.bucket_prefix}-${var.name}-${random_bytes.bucket_suffix.hex}"
   location                    = data.google_client_config.current.region
   force_destroy               = !var.deletion_protection
   uniform_bucket_level_access = true
