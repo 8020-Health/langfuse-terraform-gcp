@@ -198,12 +198,12 @@ resource "helm_release" "langfuse" {
   chart      = "langfuse"
   namespace  = kubernetes_namespace.langfuse.metadata[0].name
 
-  values = [
+  values = concat([
     local.langfuse_values,
     local.ingress_values,
     local.encryption_values,
     local.backend_config_values,
-  ]
+  ], var.additional_helm_values)
 
   depends_on = [
     kubernetes_secret.langfuse,
