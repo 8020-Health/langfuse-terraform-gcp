@@ -63,6 +63,9 @@ clickhouse:
   auth:
     existingSecret: ${kubernetes_secret.langfuse.metadata[0].name}
     existingSecretKey: clickhouse-password
+  # set persistence.size here on new deployments. defaults to 8Gi and can't be changed here (volumeClaimtemplate fixed)
+  # note: <enabled>false</enabled> for system tables does not work in clickhouse 25.2.x — ttls are managed
+  # manually via alter table after deployment - see langfuse-remediation.md
 redis:
   deploy: false
   host: ${google_redis_instance.this.host}
@@ -107,6 +110,24 @@ langfuse:
     secretKeyRef:
       name: ${kubernetes_secret.langfuse.metadata[0].name}
       key: encryption_key
+EOT
+
+  # backendconfig sets the gcp load balancer backend timeout for the langfuse web service.
+  # the gce ingress class defaults to 30s; long-running requests (exports, etc.) need more.
+  backend_config_values = <<EOT
+langfuse:
+  web:
+    service:
+      annotations:
+        cloud.google.com/backend-config: '{"default":"langfuse-backend-config"}'
+extraManifests:
+  - apiVersion: cloud.google.com/v1
+    kind: BackendConfig
+    metadata:
+      name: langfuse-backend-config
+      namespace: ${var.kubernetes_namespace}
+    spec:
+      timeoutSec: ${var.backend_timeout_sec}
 EOT
 }
 
@@ -181,6 +202,7 @@ resource "helm_release" "langfuse" {
     local.langfuse_values,
     local.ingress_values,
     local.encryption_values,
+    local.backend_config_values,
   ]
 
   depends_on = [

@@ -100,6 +100,12 @@ variable "additional_env" {
   }
 }
 
+variable "backend_timeout_sec" {
+  description = "GCP load balancer backend service timeout in seconds for the langfuse web service"
+  type        = number
+  default     = 600
+}
+
 variable "labels" {
   description = "Labels to apply to all GCP resources created by this module"
   type        = map(string)
