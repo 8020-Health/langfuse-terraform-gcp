@@ -45,3 +45,8 @@ output "subnetwork_self_link" {
   description = "VPC subnetwork self_link"
   value       = var.create_vpc ? google_compute_subnetwork.this[0].self_link : data.google_compute_subnetwork.existing[0].self_link
 }
+
+output "ingress_ip" {
+  description = "The static global IP address reserved for the Ingress"
+  value       = var.provision_static_ip ? google_compute_global_address.ingress[0].address : null
+}

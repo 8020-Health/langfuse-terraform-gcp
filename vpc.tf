@@ -116,3 +116,9 @@ locals {
   network_id   = var.create_vpc ? google_compute_network.this[0].id : data.google_compute_network.existing[0].id
   subnetwork_name = var.create_vpc ? google_compute_subnetwork.this[0].name : data.google_compute_subnetwork.existing[0].name
 }
+
+# Static External IP for Ingress
+resource "google_compute_global_address" "ingress" {
+  count = var.provision_static_ip ? 1 : 0
+  name  = "${var.name}-ingress-ip"
+}
