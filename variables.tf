@@ -166,3 +166,9 @@ variable "existing_subnetwork_name" {
   type        = string
   default     = ""
 }
+
+variable "create_dns_zone" {
+  description = "Whether to create a Google Cloud DNS managed zone. Set to `false` if you manage DNS externally."
+  type        = bool
+  default     = true
+}
