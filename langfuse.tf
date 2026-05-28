@@ -64,8 +64,24 @@ clickhouse:
     existingSecret: ${kubernetes_secret.langfuse.metadata[0].name}
     existingSecretKey: clickhouse-password
   # set persistence.size here on new deployments. defaults to 8Gi and can't be changed here (volumeClaimtemplate fixed)
+  # to resize existing pvcs: for i in 0 1 2; do kubectl patch pvc data-langfuse-clickhouse-shard0-$i -n langfuse -p '{"spec":{"resources":{"requests":{"storage":"10Gi"}}}}'; done
   # note: <enabled>false</enabled> for system tables does not work in clickhouse 25.2.x — ttls are managed
-  # manually via alter table after deployment - see langfuse-remediation.md
+  # manually via alter table after deployment
+  # spread across hosts so a single node disruption can't take out multiple shards
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: clickhouse
+        topologyKey: kubernetes.io/hostname
+  zookeeper:
+    # spread across hosts to prevent quorum loss from a single node disruption
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: zookeeper
+          topologyKey: kubernetes.io/hostname
 redis:
   deploy: false
   host: ${google_redis_instance.this.host}
